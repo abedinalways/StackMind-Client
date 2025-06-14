@@ -6,6 +6,7 @@ import { TbArrowBadgeRight } from 'react-icons/tb';
 import { BiSolidCategory } from 'react-icons/bi';
 import UseAuth from '../Hooks/UseAuth';
 import axios from 'axios';
+import toast from 'react-hot-toast';
 const BlogDetails = () => {
   const blog = useLoaderData();
   const { id } = useParams();
@@ -25,22 +26,31 @@ const BlogDetails = () => {
   }, [id])
   
   const handleComment = async () => {
-    if (!commentText.trim()) return;
-    const commentData = {
-      blogId: id,
-      text: commentText,
-      userName: user.displayName,
-      userPhoto: user.photoURL,
-      userEmail: user.email,
-    };
-    await axios.post('http://localhost:3000/comments', commentData);
-    setCommentText('');
-    const res = await axios.get(`http://localhost:3000/comments?blogId=${id}`);
-    setComments(res.data);
+    if (!commentText.trim()) return toast.error('Comment cannot be empty');
+    try{
+
+      const commentData = {
+        blogId: id,
+        text: commentText,
+        userName: user.displayName,
+        userPhoto: user.photoURL,
+        userEmail: user.email,
+      };
+      await axios.post('http://localhost:3000/comments', commentData);
+      setCommentText('');
+      const res = await axios.get(`http://localhost:3000/comments?blogId=${id}`);
+      setComments(res.data);
+      toast.success('Comment added successfully');
+    }catch (error) {
+      toast.error('Failed to add comment');
+      console.error('Error adding comment:', error);
+      
+    }
   };
+
   if (!blog) return <p>Loading...</p>;
 
-  const isAuthor = user?.email === blog.email;
+  const isAuthor = user?.email === blog?.email;
   return (
     <div className="bg-gray-200 rounded-xl shadow-md hover:shadow-xl transition duration-300 mx-auto md:px-20 px-10">
       <div className="  p-4 flex flex-col justify-between font-[sora] text-gray-800 ">
@@ -109,7 +119,7 @@ const BlogDetails = () => {
 
       {/* Comment Section */}
       <div className="border-t pt-6 mt-6">
-        <h2 className="text-xl font-semibold text-white mb-4">Comments</h2>
+        <h2 className="text-xl font-semibold text-white mb-4">Leave a Comment</h2>
 
         {!isAuthor ? (
           <>
@@ -134,7 +144,7 @@ const BlogDetails = () => {
         )}
 
         {/* Show Comments */}
-        <div className="mt-6 space-y-4">
+        <div className="mt-6 space-y-4 font-[Mulish]">
           {comments.map(comment => (
             <div key={comment._id} className="flex items-start gap-3">
               <img
@@ -143,10 +153,10 @@ const BlogDetails = () => {
                 alt={comment.userName}
               />
               <div>
-                <p className="text-sm font-semibold text-white">
+                <p className="text-xs font-semibold text-purple-600">
                   {comment.userName}
                 </p>
-                <p className="text-sm text-gray-300">{comment.text}</p>
+                <p className="text-md font-bold text-red-950">{comment.text}</p>
               </div>
             </div>
           ))}
