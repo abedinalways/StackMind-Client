@@ -8,6 +8,7 @@ import AddBlog from '../Pages/AddBlog';
 import PrivateRoute from './PrivateRoute';
 import AllBlogs from '../Pages/AllBlogs';
 import BlogDetails from '../Components/BlogDetails';
+import UpdateBlog from '../Pages/UpdateBlog';
 
 const router = createBrowserRouter([
   {
@@ -46,6 +47,14 @@ const router = createBrowserRouter([
         ),
         loader: ({ params }) => fetch(`http://localhost:3000/allBlogs/${params.id}`),
         element:<PrivateRoute><BlogDetails></BlogDetails></PrivateRoute>
+      },
+      {
+        path: '/updateBlog/:id',
+        hydrateFallbackElement: (
+          <span className="loading loading-ball loading-xs"></span>
+        ),
+        loader: ({ params }) => fetch(`http://localhost:3000/allBlogs/${params.id}`),
+        element:<PrivateRoute><UpdateBlog></UpdateBlog></PrivateRoute>
       },
       {
         path: '/login',

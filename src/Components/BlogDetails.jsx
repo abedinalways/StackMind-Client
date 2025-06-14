@@ -1,5 +1,5 @@
 import React, { useEffect, useState } from 'react';
-import { useLoaderData, useNavigate, useParams } from 'react-router';
+import { useLoaderData, useParams } from 'react-router';
 import { Link } from 'react-router'; 
 import { motion } from 'framer-motion';
 import { TbArrowBadgeRight } from 'react-icons/tb';
@@ -11,7 +11,6 @@ const BlogDetails = () => {
   const blog = useLoaderData();
   const { id } = useParams();
   const { user } = UseAuth();
-  const navigate = useNavigate();
   const [comments, setComments] = useState([]);
   const [commentText, setCommentText] = useState('');
   const formattedDate = () => {
@@ -108,18 +107,20 @@ const BlogDetails = () => {
       {/* Conditional Update Button */}
       <div>
         {isAuthor && (
-          <button
-            onClick={() => navigate(`/updateBlog/${blog._id}`)}
-            className="mb-4 bg-green-600 hover:bg-green-700 px-4 py-2 rounded text-white"
+          <Link
+            to={`/updateBlog/${id}`}
+            className="mb-4 bg-green-500 hover:bg-green-700 inline-block px-4 py-2 rounded text-purple-100 font-bold transition-colors duration-300 font-[lora]"
           >
             Update Blog
-          </button>
+          </Link>
         )}
       </div>
 
       {/* Comment Section */}
       <div className="border-t pt-6 mt-6">
-        <h2 className="text-xl font-semibold text-white mb-4">Leave a Comment</h2>
+        <h2 className="text-xl font-semibold text-white mb-4">
+          Leave a Comment
+        </h2>
 
         {!isAuthor ? (
           <>
