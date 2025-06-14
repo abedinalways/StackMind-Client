@@ -9,6 +9,7 @@ import PrivateRoute from './PrivateRoute';
 import AllBlogs from '../Pages/AllBlogs';
 import BlogDetails from '../Components/BlogDetails';
 import UpdateBlog from '../Pages/UpdateBlog';
+import FeaturedBlogs from '../Pages/FeaturedBlogs';
 
 const router = createBrowserRouter([
   {
@@ -17,7 +18,7 @@ const router = createBrowserRouter([
     children: [
       {
         index: true,
-        path:'/',
+        path: '/',
         hydrateFallbackElement: (
           <span className="loading loading-ball loading-xs"></span>
         ),
@@ -33,28 +34,50 @@ const router = createBrowserRouter([
         ),
       },
       {
-        path:'/blogs',
+        path: '/blogs',
         hydrateFallbackElement: (
           <span className="loading loading-ball loading-xs"></span>
         ),
         loader: () => fetch('http://localhost:3000/allBlogs'),
-        element:<PrivateRoute><AllBlogs></AllBlogs></PrivateRoute>
+        element: (
+          <PrivateRoute>
+            <AllBlogs></AllBlogs>
+          </PrivateRoute>
+        ),
       },
       {
         path: '/allBlogs/:id',
         hydrateFallbackElement: (
           <span className="loading loading-ball loading-xs"></span>
         ),
-        loader: ({ params }) => fetch(`http://localhost:3000/allBlogs/${params.id}`),
-        element:<PrivateRoute><BlogDetails></BlogDetails></PrivateRoute>
+        loader: ({ params }) =>
+          fetch(`http://localhost:3000/allBlogs/${params.id}`),
+        element: (
+          <PrivateRoute>
+            <BlogDetails></BlogDetails>
+          </PrivateRoute>
+        ),
       },
       {
         path: '/updateBlog/:id',
         hydrateFallbackElement: (
           <span className="loading loading-ball loading-xs"></span>
         ),
-        loader: ({ params }) => fetch(`http://localhost:3000/allBlogs/${params.id}`),
-        element:<PrivateRoute><UpdateBlog></UpdateBlog></PrivateRoute>
+        loader: ({ params }) =>
+          fetch(`http://localhost:3000/allBlogs/${params.id}`),
+        element: (
+          <PrivateRoute>
+            <UpdateBlog></UpdateBlog>
+          </PrivateRoute>
+        ),
+      },
+      {
+        path: '/featuredBlogs',
+        hydrateFallbackElement: (
+          <span className="loading loading-ball loading-xs"></span>
+        ),
+        loader:()=>fetch('http://localhost:3000/featuredBlogs'),
+        element: <FeaturedBlogs></FeaturedBlogs>,
       },
       {
         path: '/login',
