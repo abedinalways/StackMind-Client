@@ -7,6 +7,7 @@ import Register from '../Components/Register';
 import AddBlog from '../Pages/AddBlog';
 import PrivateRoute from './PrivateRoute';
 import AllBlogs from '../Pages/AllBlogs';
+import BlogDetails from '../Components/BlogDetails';
 
 const router = createBrowserRouter([
   {
@@ -31,12 +32,20 @@ const router = createBrowserRouter([
         ),
       },
       {
-        path:'/allBlogs',
+        path:'/blogs',
         hydrateFallbackElement: (
           <span className="loading loading-ball loading-xs"></span>
         ),
         loader: () => fetch('http://localhost:3000/allBlogs'),
         element:<PrivateRoute><AllBlogs></AllBlogs></PrivateRoute>
+      },
+      {
+        path: '/allBlogs/:id',
+        hydrateFallbackElement: (
+          <span className="loading loading-ball loading-xs"></span>
+        ),
+        loader: ({ params }) => fetch(`http://localhost:3000/allBlogs/${params.id}`),
+        element:<PrivateRoute><BlogDetails></BlogDetails></PrivateRoute>
       },
       {
         path: '/login',

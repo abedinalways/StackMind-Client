@@ -18,6 +18,7 @@ const AddBlog = () => {
     const shortDescription = form.shortDescription.value;
     const longDescription = form.longDescription.value;
     const name = form.name.value;
+    const email = form.email.value;
     const photoURL = form.photoURL.value;
     const blog = {
       title,
@@ -26,6 +27,7 @@ const AddBlog = () => {
       shortDescription,
       longDescription,
       name,
+      email,
       photoURL,
     }
     //add blog to database
@@ -116,6 +118,14 @@ const AddBlog = () => {
           type="text"
           name="name"
           value={user?.displayName || ''}
+          className="input bg-white border-amber-300 text-black"
+          readOnly
+        />
+        <label className="label font-bold">Email</label>
+        <input
+          type="email"
+          name="email"
+          value={user?.email || ''}
           className="input bg-white border-amber-300 text-black"
           readOnly
         />

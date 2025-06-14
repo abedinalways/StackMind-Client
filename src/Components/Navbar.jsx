@@ -54,7 +54,7 @@ const Navbar = () => {
         Add Blog
       </NavLink>
       <NavLink
-        to="/allBlogs"
+        to="/blogs"
         className={({ isActive }) =>
           isActive ? 'text-lg font-bold text-yellow-200 underline' : ''
         }
