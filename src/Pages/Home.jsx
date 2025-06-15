@@ -6,6 +6,7 @@ import Newsletter from '../Components/Newsletter';
 import { FaLongArrowAltRight } from 'react-icons/fa';
 import StarPerson from '../Components/StarPerson';
 import WorkshopPromo from '../Components/WorkshopPromo';
+import StackMindFamily from '../Components/StackMindFamily';
 const Home = () => {
   const blogs = useLoaderData();
 
@@ -50,7 +51,8 @@ const Home = () => {
         </div>
       </div>
       <StarPerson />
-      <WorkshopPromo/>
+      <WorkshopPromo />
+      <StackMindFamily/>
     </div>
   );
 };
