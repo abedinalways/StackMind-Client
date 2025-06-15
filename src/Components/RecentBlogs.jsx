@@ -36,8 +36,8 @@ const RecentBlogs = ({ blogData }) => {
     },
     onSuccess: () => {
       toast.success('Added to wishlist');
-      setIsWished(true); // ✅ update local state
-      queryClient.invalidateQueries(['wishListBlogs', user?.email]); // ✅ refresh cache
+      setIsWished(true); 
+      queryClient.invalidateQueries(['wishListBlogs', user?.email]); 
     },
     onError: err => {
       toast.error(err?.response?.data?.message || 'Failed to add to wishlist');

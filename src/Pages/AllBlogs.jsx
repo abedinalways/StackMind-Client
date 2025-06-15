@@ -3,8 +3,7 @@ import axios from 'axios';
 import toast from 'react-hot-toast';
 import BlogCard from './BlogCard';
 import UseAuth from '../Hooks/UseAuth';
-
-
+import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query';
 
 const AllBlogs = () => {
   const [blogs, setBlogs] = useState([]);
@@ -12,6 +11,8 @@ const AllBlogs = () => {
   const [search, setSearch] = useState('');
   const [category, setCategory] = useState('');
   const { user } = UseAuth();
+  const queryClient = useQueryClient();
+
   const loadBlogs = async () => {
     try {
       const res = await axios.get(`http://localhost:3000/allBlogs`, {
@@ -41,32 +42,54 @@ const AllBlogs = () => {
   const handleCategoryChange = e => {
     setCategory(e.target.value === 'All' ? '' : e.target.value);
   };
+  
+  
+  //
+  const { data: wishlistedBlogs = [] } = useQuery({
+    queryKey: ['wishListBlogs', user?.email],
+    queryFn: async () => {
+      if (!user?.email) return [];
+      const res = await axios.get(
+        `http://localhost:3000/wishList/${user.email}`
+      );
+      return res.data;
+    },
+    enabled: !!user?.email,
+  });
 
-  const handleWishlist = async blogId => {
-    if (!user?.email) {
-      toast.error('Please login to add to wishlist');
-      return;
-    }
-    try {
-      await axios.post('http://localhost:3000/wishList', {
+  const wishlistedIds = wishlistedBlogs.map(blog => blog._id);
+
+  const mutation = useMutation({
+    mutationFn: async ({ blogId }) => {
+      return await axios.post('http://localhost:3000/wishList', {
         blogId,
         userEmail: user.email,
       });
+    },
+    onSuccess: (data, variables) => {
       toast.success('Added to wishlist');
-    } catch (err) {
-      if (err?.response?.status === 400) {
-        toast.error(err.response.data.error);
-      } else {
-        toast.error('Failed to add to wishlist');
-      }
+      queryClient.invalidateQueries(['wishListBlogs', user?.email]);
+    },
+    onError: err => {
+      toast.error(err?.response?.data?.message || 'Failed to add to wishlist');
+    },
+  });
+
+  const handleWishlist = blogId => {
+    if (!user?.email) return toast.error('Please login to add to wishlist');
+    if (wishlistedIds.includes(blogId)) {
+      return toast('Already in wishlist');
     }
+    mutation.mutate({ blogId });
   };
 
   return (
     <div className="container mx-auto px-4 py-10 ">
       <div className="flex flex-col md:flex-row justify-between items-center mb-6 gap-4">
-        <form onSubmit={handleSearch} className="flex mx-auto justify-center items-center font-[mulish]">
-          
+        <form
+          onSubmit={handleSearch}
+          className="flex mx-auto justify-center items-center font-[mulish]"
+        >
           <input
             type="text"
             className="input md:w-80  border-amber-200 bg-white"
@@ -84,8 +107,8 @@ const AllBlogs = () => {
           className="select border-amber-200 bg-white w-60 mx-auto font-[mulish] text-gray-700"
           aria-label="Select Category"
         >
-          {categories.map((cat, idx) => (
-            <option key={idx} value={cat}>
+          {categories.map((cat, index) => (
+            <option key={index} value={cat}>
               {cat}
             </option>
           ))}
@@ -93,9 +116,12 @@ const AllBlogs = () => {
       </div>
       <div className="grid grid-cols-1 md:grid-cols-2 gap-10">
         {blogs.map(blog => (
-          <div key={blog._id}>
-            <BlogCard blog={blog} handleWishlist={handleWishlist} />
-          </div>
+          <BlogCard
+            key={blog._id}
+            blog={blog}
+            isWished={wishlistedIds.includes(blog._id)}
+            onWishlist={handleWishlist}
+          />
         ))}
       </div>
     </div>

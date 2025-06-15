@@ -2,7 +2,7 @@ import React from 'react';
 import { Link } from 'react-router'; 
 import { motion } from 'framer-motion';
 
-const BlogCard = ({ blog, handleWishlist }) => {
+const BlogCard = ({ blog, isWished, onWishlist }) => {
   return (
     <motion.div
       initial={{ opacity: 0, y: 20 }}
@@ -26,20 +26,17 @@ const BlogCard = ({ blog, handleWishlist }) => {
         {blog.shortDescription}
       </p>
 
-      
       <div className="flex items-center gap-3 mb-4">
         <img
           src={blog.photoURL || '/default-avatar.png'}
-          referrerPolicy='no-referrer'
+          referrerPolicy="no-referrer"
           className="w-8 h-8 rounded-full object-cover"
         />
         <div className="text-sm text-gray-500">
           <p className="font-semibold text-gray-700">{blog.name}</p>
-          
         </div>
       </div>
 
-     
       <div className="mt-auto flex justify-between">
         <Link
           to={`/allBlogs/${blog._id}`}
@@ -48,10 +45,15 @@ const BlogCard = ({ blog, handleWishlist }) => {
           See Details
         </Link>
         <button
-          onClick={() => handleWishlist(blog._id)}
-          className="px-4 py-1.5 text-sm rounded bg-rose-500 text-white hover:bg-rose-600"
+          onClick={() => onWishlist(blog._id)}
+          disabled={isWished}
+          className={`px-4 py-1.5 text-sm rounded text-white ${
+            isWished
+              ? 'bg-gray-400 cursor-not-allowed'
+              : 'bg-rose-500 hover:bg-rose-600'
+          }`}
         >
-          Wishlist
+          {isWished ? 'Wishlisted' : 'Wishlist'}
         </button>
       </div>
     </motion.div>
