@@ -26,7 +26,7 @@ const BlogCard = ({ blog, handleWishlist }) => {
         {blog.shortDescription}
       </p>
 
-      {/* Author & Date */}
+      
       <div className="flex items-center gap-3 mb-4">
         <img
           src={blog.photoURL || '/default-avatar.png'}
@@ -39,7 +39,7 @@ const BlogCard = ({ blog, handleWishlist }) => {
         </div>
       </div>
 
-      {/* Action buttons */}
+     
       <div className="mt-auto flex justify-between">
         <Link
           to={`/allBlogs/${blog._id}`}

@@ -11,11 +11,11 @@ import {
 import axios from 'axios';
 import toast from 'react-hot-toast';
 
-// Define column helper
+
 const columnHelper = createColumnHelper();
 
 const FeaturedBlogs = () => {
-  // Fetch featured blogs
+  
   const {
     data: blogs = [],
     isLoading,
@@ -33,7 +33,7 @@ const FeaturedBlogs = () => {
     },
   });
 
-  // Define columns
+  
   const columns = [
     columnHelper.accessor('title', {
       header: 'Title',
@@ -60,7 +60,7 @@ const FeaturedBlogs = () => {
     
   ];
 
-  // Initialize table
+  
   const [sorting, setSorting] = useState([]);
   const table = useReactTable({
     data: blogs,
@@ -73,7 +73,7 @@ const FeaturedBlogs = () => {
     },
   });
 
-  // Handle error
+  
   useEffect(() => {
     if (error) {
       toast.error(`Failed to fetch featured blogs: ${error.message}`);
@@ -89,7 +89,7 @@ const FeaturedBlogs = () => {
         Featured Blogs: Top 10 by Word Count
       </h1>
       <div className="bg-white rounded-xl shadow-md">
-        {/* Table for larger screens */}
+        
         <table className="w-full border-collapse">
           <thead>
             {table.getHeaderGroups().map(headerGroup => (

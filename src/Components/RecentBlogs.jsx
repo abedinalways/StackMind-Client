@@ -1,19 +1,65 @@
-import React from 'react';
+import React, { useEffect, useState } from 'react';
 import { BsBookmarkStarFill } from 'react-icons/bs';
 import { BiMessageRounded } from 'react-icons/bi';
 import { motion } from 'framer-motion';
+import { Link } from 'react-router';
+import UseAuth from '../Hooks/UseAuth';
+import axios from 'axios';
+import toast from 'react-hot-toast';
+import { useMutation, useQueryClient } from '@tanstack/react-query';
+
 const RecentBlogs = ({ blogData }) => {
-  const { _id, title, category, name, photoURL } =
-    blogData;
+  const { _id, title, category, name, photoURL } = blogData;
   const formattedDate = () => {
     const today = new Date();
-    const options = { year: 'numeric', month: 'long', day: 'numeric' };
-    return today.toLocaleDateString('en-US', options);
+    return today.toLocaleDateString('en-US', {
+      year: 'numeric',
+      month: 'long',
+      day: 'numeric',
+    });
   };
   const reactions = Math.floor(Math.random() * 10);
-  const readingTime = Math.floor(Math.random() * 10) + 1; 
-  const comments = Math.floor(Math.random() * 10) +2;
-  
+  const readingTime = Math.floor(Math.random() * 10) + 1;
+  const comments = Math.floor(Math.random() * 10) + 2;
+
+  const { user } = UseAuth();
+  const [isWished, setIsWished] = useState(false);
+  const queryClient = useQueryClient();
+
+  const addToWishList = useMutation({
+    mutationFn: async ({ blogId, userEmail }) => {
+      const res = await axios.post('http://localhost:3000/wishList', {
+        blogId,
+        userEmail,
+      });
+      return res.data;
+    },
+    onSuccess: () => {
+      toast.success('Added to wishlist');
+      setIsWished(true); // ✅ update local state
+      queryClient.invalidateQueries(['wishListBlogs', user?.email]); // ✅ refresh cache
+    },
+    onError: err => {
+      toast.error(err?.response?.data?.message || 'Failed to add to wishlist');
+    },
+  });
+
+  useEffect(() => {
+    const fetchWishlistStatus = async () => {
+      try {
+        const res = await axios.get(
+          `http://localhost:3000/wishList/${user?.email}`
+        );
+        const wishedIds = res.data.map(item => item._id);
+        setIsWished(wishedIds.includes(_id));
+      } catch (error) {
+        console.error('Failed to fetch wishlist:', error);
+      }
+    };
+
+    if (user?.email) fetchWishlistStatus();
+  }, [user, _id]);
+
   return (
     <motion.div
       initial={{ opacity: 0, y: 30 }}
@@ -30,7 +76,7 @@ const RecentBlogs = ({ blogData }) => {
         <small className="text-xs text-gray-500">{formattedDate()}</small>
       </div>
 
-      <div className="card-body ">
+      <div className="card-body">
         <h2 className="card-title text-sm text-gray-600">{title}</h2>
         <p className="text-xs text-green-800 font-bold"># {category}</p>
         <div className="flex flex-col justify-between items-baseline mt-2 text-sm text-gray-500">
@@ -41,20 +87,32 @@ const RecentBlogs = ({ blogData }) => {
               <span>🔥</span>
               <span>{reactions} reactions</span>
             </div>
-            <div className='flex items-center gap-1 text-gray-800 text-sm'>
+            <div className="flex items-center gap-1 text-gray-800 text-sm">
               <BiMessageRounded /> {comments} comments
             </div>
           </div>
           <div className="mt-4 flex items-center justify-between w-full">
-            <button className="btn btn-sm bg-red-400 text-white hover:bg-red-500  px-4 py-1 text-xs rounded-md">
+            <Link
+              to={`/allBlogs/${_id}`}
+              className="btn btn-sm bg-red-400 text-white hover:bg-red-500 px-4 py-1 text-xs rounded-md"
+            >
               Read More
-            </button>
-            <button className="flex gap-2 text-gray-500 ">
+            </Link>
+            <button
+              onClick={() => {
+                if (!user?.email) {
+                  return toast.error('Please login to add to wishlist');
+                }
+                if (isWished) {
+                  return toast('Already in wishlist');
+                }
+                addToWishList.mutate({ blogId: _id, userEmail: user.email });
+              }}
+              className="flex items-center gap-1 text-gray-600 hover:text-red-500 disabled:opacity-50"
+              disabled={isWished}
+            >
               <span>⏱️ {readingTime} min read</span>
-              <BsBookmarkStarFill
-                size="20px"
-                className="cursor-pointer hover:text-red-500"
-              />
+              <BsBookmarkStarFill size="20px" />
             </button>
           </div>
         </div>

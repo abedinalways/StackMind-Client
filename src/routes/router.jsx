@@ -10,6 +10,7 @@ import AllBlogs from '../Pages/AllBlogs';
 import BlogDetails from '../Components/BlogDetails';
 import UpdateBlog from '../Pages/UpdateBlog';
 import FeaturedBlogs from '../Pages/FeaturedBlogs';
+import WishList from '../Pages/WishList';
 
 const router = createBrowserRouter([
   {
@@ -78,6 +79,10 @@ const router = createBrowserRouter([
         ),
         loader:()=>fetch('http://localhost:3000/featuredBlogs'),
         element: <FeaturedBlogs></FeaturedBlogs>,
+      },
+      {
+        path: '/wishList',
+        element:<PrivateRoute><WishList></WishList></PrivateRoute>
       },
       {
         path: '/login',
