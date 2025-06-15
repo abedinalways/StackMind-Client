@@ -61,6 +61,7 @@ const RecentBlogs = ({ blogData }) => {
   }, [user, _id]);
 
   return (
+    <>
     <motion.div
       initial={{ opacity: 0, y: 30 }}
       animate={{ opacity: 1, y: 0 }}
@@ -108,16 +109,18 @@ const RecentBlogs = ({ blogData }) => {
                 }
                 addToWishList.mutate({ blogId: _id, userEmail: user.email });
               }}
-              className="flex items-center gap-1 text-gray-600 hover:text-red-500 disabled:opacity-50"
+              className="flex items-center gap-1 text-blue-600 hover:text-red-500 disabled:opacity-50"
               disabled={isWished}
             >
-              <span>⏱️ {readingTime} min read</span>
               <BsBookmarkStarFill size="20px" />
             </button>
+              <span>⏱️ {readingTime} min read</span>
           </div>
         </div>
       </div>
     </motion.div>
+        
+    </>
   );
 };
 

@@ -1,9 +1,11 @@
 import React from 'react';
 import Banner from '../Components/Banner';
-import { useLoaderData } from 'react-router';
+import { Link, useLoaderData } from 'react-router';
 import RecentBlogs from '../Components/RecentBlogs';
 import Newsletter from '../Components/Newsletter';
-
+import { FaLongArrowAltRight } from 'react-icons/fa';
+import StarPerson from '../Components/StarPerson';
+import WorkshopPromo from '../Components/WorkshopPromo';
 const Home = () => {
   const blogs = useLoaderData();
 
@@ -11,9 +13,9 @@ const Home = () => {
     <div className="bg-red-50 dark:bg-gray-900 min-h-screen">
       <Banner />
       <div className="container mx-auto px-4 py-10">
-        {/* Main content with blogs and newsletter sidebar */}
+        
         <div className="flex flex-col lg:flex-row gap-10">
-          {/* Recent Blogs Section */}
+         
           <div className="flex-1">
             <h1
               className="text-center font-extrabold font-[Suse] text-3xl md:text-5xl mt-4 text-orange-500 dark:text-white"
@@ -35,6 +37,11 @@ const Home = () => {
                 </p>
               )}
             </div>
+            <div className="flex justify-center">
+              <Link to="/blogs" className="font-[Suse] btn btn-link text-lg text-gray-800 cursor-pointer">
+                SEE MORE LATEST ARTICLES <span><FaLongArrowAltRight /></span>
+              </Link>
+            </div>
           </div>
           {/* Newsletter Sidebar */}
           <div className="md:w-[30%] md:mt-28">
@@ -42,6 +49,8 @@ const Home = () => {
           </div>
         </div>
       </div>
+      <StarPerson />
+      <WorkshopPromo/>
     </div>
   );
 };

@@ -50,13 +50,31 @@ const BlogDetails = () => {
   if (!blog) return <p>Loading...</p>;
 
   const isAuthor = user?.email === blog?.email;
+
+  const formatLongDescription = text => {
+    const sentences = text.split(/([.!?])\s(?=[A-Z])/).filter(s => s.trim());
+    const chunks = [];
+
+    for (let i = 0; i < sentences.length; i += 4) {
+      chunks.push(sentences.slice(i, i + 4).join(' '));
+    }
+
+    return (
+      <div className="text-gray-600 text-md leading-relaxed space-y-4">
+        {chunks.map((chunk, index) => (
+          <p key={index}>{chunk}</p>
+        ))}
+      </div>
+    );
+  };
+
   return (
     <div className="bg-gray-200 rounded-xl shadow-md hover:shadow-xl transition duration-300 mx-auto md:px-20 px-10">
       <div className="  p-4 flex flex-col justify-between font-[sora] text-gray-800 ">
         <div className="flex items-center gap-3 mb-4">
           <div className="text-sm text-gray-500 flex items-center justify-between gap-10">
             <p className="font-semibold text-red-950 underline">
-              {blog.name} / {formattedDate()} /{comments.length} comments
+              {blog.name} / {formattedDate()} /{comments.length} comment
             </p>
           </div>
         </div>
@@ -100,8 +118,8 @@ const BlogDetails = () => {
           alt={blog.title}
           className=" w-[70%] rounded-lg mb-4"
         />
-        <p className="text-gray-600 text-md w-5/6 mb-4">
-          {blog.longDescription}
+        <p className="text-gray-600 text-md w-5/6 leading-relaxed mb-6">
+          {formatLongDescription(blog.longDescription)}
         </p>
       </div>
       {/* Conditional Update Button */}
@@ -118,8 +136,8 @@ const BlogDetails = () => {
 
       {/* Comment Section */}
       <div className="border-t pt-6 mt-6">
-        <h2 className="text-xl font-semibold text-white mb-4">
-          Leave a Comment
+        <h2 className="text-2xl font-bold text-[#00d493] mb-4 font-[Suse]">
+          LEAVE A COMMENT
         </h2>
 
         {!isAuthor ? (
@@ -127,15 +145,15 @@ const BlogDetails = () => {
             <textarea
               value={commentText}
               onChange={e => setCommentText(e.target.value)}
-              className="w-full p-3 rounded bg-gray-800 text-white mb-2 resize-none"
+              className="w-full p-3 rounded bg-white shadow-md text-black mb-2 resize-none"
               placeholder="Add your comment..."
               rows={3}
             />
             <button
               onClick={handleComment}
-              className="bg-blue-600 hover:bg-blue-700 px-4 py-2 rounded text-white"
+              className="bg-[#00d493] font-bold text-lg text-white px-4 py-2 rounded-md"
             >
-              Submit Comment
+              Post Comment
             </button>
           </>
         ) : (
@@ -145,7 +163,7 @@ const BlogDetails = () => {
         )}
 
         {/* Show Comments */}
-        <div className="mt-6 space-y-4 font-[Mulish]">
+        <div className="mt-6 space-y-4 font-[Mulish] ">
           {comments.map(comment => (
             <div key={comment._id} className="flex items-start gap-3">
               <img
@@ -157,7 +175,7 @@ const BlogDetails = () => {
                 <p className="text-xs font-semibold text-purple-600">
                   {comment.userName}
                 </p>
-                <p className="text-md font-bold text-red-950">{comment.text}</p>
+                <p className="text-md font-bold text-red-950 mb-4">{comment.text}</p>
               </div>
             </div>
           ))}
