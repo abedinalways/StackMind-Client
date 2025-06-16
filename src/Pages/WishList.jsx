@@ -31,22 +31,23 @@ const WishList = () => {
   } = useQuery({
     queryKey: ['wishListBlogs', user?.email],
     queryFn: async () => {
-      if (!user?.email) {
-        throw new Error('User not logged in');
+      if (!user?.email) return [];
+      try {
+        const res = await get(`/wishList/${user.email}`);
+        console.log('Wishlist data:', res.data); 
+        return res.data || []; 
+      } catch (err) {
+        console.error('Error fetching wishlist:', err);
+        return []; 
       }
-      const res = await get(
-        `http://localhost:3000/wishList/${user.email}`
-      );
-      return res.data;
     },
-    enabled: !!user?.email, 
+    enabled: !!user?.email,
   });
-
   
   const removeFromWishList = useMutation({
     mutationFn: async blogId => {
       const res = await del(
-        `http://localhost:3000/wishList/${blogId}?email=${user.email}`
+        `/wishList/${blogId}?email=${user.email}`
       );
       return res.data;
     },
@@ -57,6 +58,7 @@ const WishList = () => {
     onError: err => {
      
       console.error('Error removing from wishlist:', err);
+      toast.error('Failed to remove from wishlist');
     },
   });
 
