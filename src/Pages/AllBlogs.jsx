@@ -1,79 +1,81 @@
 import React, { useEffect, useState } from 'react';
-import axios from 'axios';
 import toast from 'react-hot-toast';
 import BlogCard from './BlogCard';
 import UseAuth from '../Hooks/UseAuth';
 import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query';
+import useAxios from '../Hooks/useAxios';
 
 const AllBlogs = () => {
-  const [blogs, setBlogs] = useState([]);
-  const [categories, setCategories] = useState([]);
   const [search, setSearch] = useState('');
   const [category, setCategory] = useState('');
   const { user } = UseAuth();
+  const { get, post } = useAxios();
   const queryClient = useQueryClient();
 
-  const loadBlogs = async () => {
-    try {
-      const res = await axios.get(`http://localhost:3000/allBlogs`, {
-        params: { category, search },
+  // Fetch blogs with query parameters
+  const {
+    data: blogs = [],
+    isLoading: loadingBlogs,
+    error: blogsError,
+  } = useQuery({
+    queryKey: ['blogs', category, search],
+    queryFn: async () => {
+      const res = await get('/allBlogs', {
+        params: { category: category || undefined, search },
       });
-      setBlogs(res.data);
-    } catch (err) {
-      toast.error('Error loading blogs');
-    }
-  };
+      return res;
+    },
+    enabled: true, 
+  });
 
-  useEffect(() => {
-    axios.get('http://localhost:3000/categories').then(res => {
-      setCategories(['All', ...res.data]);
-    });
-  }, []);
+  // Fetch categories
+  const {
+    data: categories = [],
+    isLoading: loadingCategories,
+    error: categoriesError,
+  } = useQuery({
+    queryKey: ['categories'],
+    queryFn: async () => {
+      const res = await get('/categories');
+      return ['All', ...res];
+    },
+  });
 
-  useEffect(() => {
-    loadBlogs();
-  }, [category, search]);
-
-  const handleSearch = e => {
-    e.preventDefault();
-    loadBlogs();
-  };
-
-  const handleCategoryChange = e => {
-    setCategory(e.target.value === 'All' ? '' : e.target.value);
-  };
-  
-  
-  //
-  const { data: wishlistedBlogs = [] } = useQuery({
+  // Fetch wishlisted blogs
+  const { data: wishlistedBlogs = [], isLoading: loadingWishlist } = useQuery({
     queryKey: ['wishListBlogs', user?.email],
     queryFn: async () => {
       if (!user?.email) return [];
-      const res = await axios.get(
-        `http://localhost:3000/wishList/${user.email}`
-      );
-      return res.data;
+      const res = await get(`/wishList/${user.email}`);
+      return res;
     },
     enabled: !!user?.email,
   });
 
   const wishlistedIds = wishlistedBlogs.map(blog => blog._id);
 
+  // Mutation to add to wishlist
   const mutation = useMutation({
     mutationFn: async ({ blogId }) => {
-      return await axios.post('http://localhost:3000/wishList', {
-        blogId,
-        userEmail: user.email,
-      });
+      return await post('/wishList', { blogId, userEmail: user.email });
     },
     onSuccess: (data, variables) => {
       toast.success('Added to wishlist');
       queryClient.invalidateQueries(['wishListBlogs', user?.email]);
     },
     onError: err => {
-      toast.error(err?.response?.data?.message || 'Failed to add to wishlist');
+      toast.error(err?.response?.data?.error || 'Failed to add to wishlist'); 
     },
   });
+
+  const handleSearch = e => {
+    e.preventDefault();
+    
+  };
+
+  const handleCategoryChange = e => {
+    setCategory(e.target.value === 'All' ? '' : e.target.value);
+  };
 
   const handleWishlist = blogId => {
     if (!user?.email) return toast.error('Please login to add to wishlist');
@@ -82,6 +84,16 @@ const AllBlogs = () => {
     }
     mutation.mutate({ blogId });
   };
+
+  // Handle errors
+  useEffect(() => {
+    if (blogsError && !blogsError.response?.status === 401) {
+      toast.error('Error loading blogs');
+    }
+    if (categoriesError && !categoriesError.response?.status === 401) {
+      toast.error('Error loading categories');
+    }
+  }, [blogsError, categoriesError]);
 
   return (
     <div className="container mx-auto px-4 py-10 ">
@@ -97,7 +109,11 @@ const AllBlogs = () => {
             value={search}
             onChange={e => setSearch(e.target.value)}
           />
-          <button className="btn bg-orange-500 text-white ml-1" type="submit">
+          <button
+            className="btn bg-orange-500 text-white ml-1"
+            type="submit"
+            disabled={loadingBlogs || loadingCategories}
+          >
             Search
           </button>
         </form>
@@ -106,23 +122,37 @@ const AllBlogs = () => {
           onChange={handleCategoryChange}
           className="select border-amber-200 bg-white w-60 mx-auto font-[mulish] text-gray-700"
           aria-label="Select Category"
+          disabled={loadingCategories}
         >
-          {categories.map((cat, index) => (
-            <option key={index} value={cat}>
-              {cat}
-            </option>
-          ))}
+          {loadingCategories ? (
+            <option>Loading categories...</option>
+          ) : (
+            categories.map((cat, index) => (
+              <option key={index} value={cat}>
+                {cat}
+              </option>
+            ))
+          )}
         </select>
       </div>
       <div className="grid grid-cols-1 md:grid-cols-2 gap-10">
-        {blogs.map(blog => (
-          <BlogCard
-            key={blog._id}
-            blog={blog}
-            isWished={wishlistedIds.includes(blog._id)}
-            onWishlist={handleWishlist}
-          />
-        ))}
+        {loadingBlogs || loadingWishlist ? (
+          <p className="text-center">Loading blogs...</p>
+        ) : blogsError ? (
+          <p className="text-center text-red-500">Failed to load blogs</p>
+        ) : blogs.length === 0 ? (
+          <p className="text-center text-gray-500">No blogs found</p>
+        ) : (
+          blogs.map(blog => (
+            <BlogCard
+              key={blog._id}
+              blog={blog}
+              isWished={wishlistedIds.includes(blog._id)}
+              onWishlist={handleWishlist}
+              disabled={mutation.isLoading}
+            />
+          ))
+        )}
       </div>
     </div>
   );

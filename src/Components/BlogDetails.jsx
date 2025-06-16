@@ -5,45 +5,72 @@ import { motion } from 'framer-motion';
 import { TbArrowBadgeRight } from 'react-icons/tb';
 import { BiSolidCategory } from 'react-icons/bi';
 import UseAuth from '../Hooks/UseAuth';
-import axios from 'axios';
+
 import toast from 'react-hot-toast';
+import useAxios from '../Hooks/useAxios';
 const BlogDetails = () => {
   const blog = useLoaderData();
   const { id } = useParams();
   const { user } = UseAuth();
   const [comments, setComments] = useState([]);
   const [commentText, setCommentText] = useState('');
+  const [loadingComments, setLoadingComments] = useState(true);
+  const [submittingComment, setSubmittingComment] = useState(false);
+  const { get, post} = useAxios();
+
   const formattedDate = () => {
     const today = new Date();
     const options = { year: 'numeric', month: 'long', day: 'numeric' };
     return today.toLocaleDateString('en-US', options);
   };
-  useEffect(() => {
-    axios.get(`http://localhost:3000/comments?blogId=${id}`).then(res => {
-      setComments(res.data);
-    })
-  }, [id])
   
-  const handleComment = async () => {
-    if (!commentText.trim()) return toast.error('Comment cannot be empty');
-    try{
+  useEffect(() => {
+    const fetchComments = async () => {
+      try {
+        setLoadingComments(true);
+        const res = await get(`/comments?blogId=${id}`);
+        setComments(res);
+      } catch (error) {
+        
+        if (!error.response || error.response.status !== 401) {
+          toast.error('Failed to load comments');
+        }
+      } finally {
+        setLoadingComments(false);
+      }
+    };
+    fetchComments();
 
-      const commentData = {
-        blogId: id,
-        text: commentText,
-        userName: user.displayName,
-        userPhoto: user.photoURL,
-        userEmail: user.email,
-      };
-      await axios.post('http://localhost:3000/comments', commentData);
+    return () => {};
+  }, [id, get]);
+
+  const handleComment = async () => {
+    if (!commentText.trim()) {
+      toast.error('Comment cannot be empty');
+      return;
+    }
+    setSubmittingComment(true);
+    const commentData = {
+      blogId: id,
+      text: commentText,
+      userName: user?.displayName || 'Anonymous',
+      userPhoto: user?.photoURL || '',
+      userEmail: user?.email || '',
+    };
+
+    try {
+      await post('/comments', commentData);
+      const res = await get(`/comments?blogId=${id}`);
+      setComments(res);
       setCommentText('');
-      const res = await axios.get(`http://localhost:3000/comments?blogId=${id}`);
-      setComments(res.data);
       toast.success('Comment added successfully');
-    }catch (error) {
-      toast.error('Failed to add comment');
-      console.error('Error adding comment:', error);
+    } catch (error) {
       
+      if (!error.response || error.response.status !== 401) {
+        toast.error('Failed to add comment');
+      }
+    } finally {
+      setSubmittingComment(false);
     }
   };
 
@@ -148,12 +175,14 @@ const BlogDetails = () => {
               className="w-full p-3 rounded bg-white shadow-md text-black mb-2 resize-none"
               placeholder="Add your comment..."
               rows={3}
+              disabled={submittingComment}
             />
             <button
               onClick={handleComment}
               className="bg-[#00d493] font-bold text-lg text-white px-4 py-2 rounded-md"
+              disabled={submittingComment}
             >
-              Post Comment
+              {submittingComment ? 'Submitting...' : 'Post Comment'}
             </button>
           </>
         ) : (
@@ -163,22 +192,30 @@ const BlogDetails = () => {
         )}
 
         {/* Show Comments */}
-        <div className="mt-6 space-y-4 font-[Mulish] ">
-          {comments.map(comment => (
-            <div key={comment._id} className="flex items-start gap-3">
-              <img
-                src={comment.userPhoto}
-                className="w-8 h-8 rounded-full"
-                alt={comment.userName}
-              />
-              <div>
-                <p className="text-xs font-semibold text-purple-600">
-                  {comment.userName}
-                </p>
-                <p className="text-md font-bold text-red-950 mb-4">{comment.text}</p>
+        <div className="mt-6 space-y-4 font-[Mulish]">
+          {loadingComments ? (
+            <p className="text-center">Loading comments...</p>
+          ) : comments.length === 0 ? (
+            <p className="text-center text-gray-500">No comments yet.</p>
+          ) : (
+            comments.map(comment => (
+              <div key={comment._id} className="flex items-start gap-3">
+                <img
+                  src={comment.userPhoto || '/default-avatar.png'}
+                  className="w-8 h-8 rounded-full"
+                  alt={comment.userName}
+                />
+                <div>
+                  <p className="text-xs font-semibold text-purple-600">
+                    {comment.userName || 'Anonymous'}
+                  </p>
+                  <p className="text-md font-bold text-red-950 mb-4">
+                    {comment.text}
+                  </p>
+                </div>
               </div>
-            </div>
-          ))}
+            ))
+          )}
         </div>
       </div>
     </div>
