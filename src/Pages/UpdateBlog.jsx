@@ -2,9 +2,9 @@ import React, { useEffect, useState } from 'react';
 import { useParams, useNavigate } from 'react-router';
 import { ImBlog } from 'react-icons/im';
 import UseAuth from '../Hooks/UseAuth';
-import axios from 'axios';
 import Swal from 'sweetalert2';
 import toast from 'react-hot-toast';
+import useAxios from '../Hooks/useAxios';
 
 const UpdateBlog = () => {
   const { user } = UseAuth();
@@ -12,20 +12,21 @@ const UpdateBlog = () => {
   const navigate = useNavigate();
   const [loading, setLoading] = useState(false);
   const [blog, setBlog] = useState(null);
+  const { get, patch} = useAxios();
 
   
   useEffect(() => {
     const fetchBlog = async () => {
       try {
-        const res = await axios.get(`http://localhost:3000/allBlogs/${id}`);
+        const res = await get(`http://localhost:3000/allBlogs/${id}`);
         setBlog(res.data);
       } catch (err) {
-        toast.error('Failed to fetch blog details');
+        
         console.error('Error fetching blog:', err);
       }
     };
     fetchBlog();
-  }, [id]);
+  }, [id, get]);
 
  
   if (blog && user?.email !== blog.email) {
@@ -51,7 +52,7 @@ const UpdateBlog = () => {
     };
 
     try {
-      const res = await axios.patch(
+      const res = await patch(
         `http://localhost:3000/allBlogs/${id}?email=${user?.email}`,
         updatedBlog
       );
@@ -66,7 +67,7 @@ const UpdateBlog = () => {
         navigate(`/allBlogs/${id}`);
       }
     } catch (err) {
-      toast.error(err.response?.data?.error || 'Failed to update blog');
+      
       console.error('Error updating blog:', err);
     } finally {
       setLoading(false);
