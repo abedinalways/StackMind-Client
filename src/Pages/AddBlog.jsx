@@ -1,14 +1,16 @@
 import React, { useState } from 'react';
 import { ImBlog } from 'react-icons/im';
 import UseAuth from '../Hooks/UseAuth';
-import axios from 'axios';
 import Swal from 'sweetalert2';
 import toast from 'react-hot-toast';
+import useAxios from '../Hooks/useAxios';
+
 const AddBlog = () => {
   const { user } = UseAuth();
   const [loading, setLoading]=useState(false);
-
-  const handleAddBlog=e=>{
+  const { post } = useAxios();
+  
+  const handleAddBlog = async (e) => {
     e.preventDefault();
     setLoading(true);
     const form = e.target;
@@ -29,11 +31,11 @@ const AddBlog = () => {
       name,
       email,
       photoURL,
-    }
-    //add blog to database
-    axios.post('http://localhost:3000/blogs', blog).then(res => {
-      console.log(res.data);
-      if (res.data.insertedId) {
+    };
+
+    try {
+      const res = await post('/blogs', blog);
+      if (res.insertedId) {
         Swal.fire({
           position: 'top-end',
           icon: 'success',
@@ -41,11 +43,19 @@ const AddBlog = () => {
           showConfirmButton: false,
           timer: 1500,
         });
-         form.reset();
+        form.reset();
       }
+    } catch (error) {
+      
+      if (!error.response || error.response.status !== 401) {
+        toast.error('Failed to add blog. Please try again.');
+      }
+    } finally {
       setLoading(false);
-    }).catch(error=>toast.error(error.message));
-  }
+    }
+
+  };
+
   return (
     <>
       <span className="flex justify-center gap-2 mb-2 py-4  font-[Suse] dark:text-blue-600">
