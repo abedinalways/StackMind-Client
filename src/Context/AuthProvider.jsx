@@ -4,10 +4,18 @@ import { createUserWithEmailAndPassword, GoogleAuthProvider, onAuthStateChanged,
 import { auth } from '../Firebase/firebase.init';
 import axios from 'axios';
 
+import toast from 'react-hot-toast';
+
+
+const api = axios.create({
+  baseURL: 'http://localhost:3000',
+  withCredentials: true,
+});
+
 const AuthProvider = ({ children }) => {
   const [user, setUser] = useState(null);
   const [loading, setLoading]=useState(true);
-
+  
   const createUser = (email, password) => {
     setLoading(true);
     return createUserWithEmailAndPassword(auth, email, password)
@@ -18,9 +26,18 @@ const AuthProvider = ({ children }) => {
     return signInWithEmailAndPassword(auth, email, password)
   }
   
-  const signOutUser = () => {
+  const signOutUser = async() => {
     setLoading(true);
-    return signOut(auth);
+    try {
+      await api.post('/logout', {});
+      await signOut(auth);
+      setUser(null);
+    } catch (err) {
+      toast.error('Logout failed');
+      console.error('Logout error:', err);
+    } finally {
+      setLoading(false);
+    }
   }
 
   const googleSignIn = () => {
@@ -30,25 +47,27 @@ const AuthProvider = ({ children }) => {
   }
   
   useEffect(() => {
-    const unsubscribe = onAuthStateChanged(auth, currentUser => {
+    const unsubscribe = onAuthStateChanged(auth, async currentUser => {
       setUser(currentUser);
-      setLoading(false);
       if (currentUser?.email) {
-        const userData = { email: currentUser.email };
-        axios.post('http://localhost:3000/jwt', userData, {
-          withCredentials:true
-        }).then(res => {
-          console.log(res.data);
-        }).catch(error => {
-          console.log(error);
-        })
+        try {
+          const res = await api.post('/jwt', { email: currentUser.email });
+          if (res.data.message !== 'jwt created successfully') {
+            throw new Error('JWT creation failed');
+          }
+        } catch (err) {
+          toast.error('Failed to generate JWT. Logging out...');
+          console.error('JWT generation error:', err);
+          await signOut(auth);
+          setUser(null);
+          
+        }
       }
-    })
-    return () => {
-      unsubscribe();
-    }
-    
-  },[])
+      setLoading(false);
+    });
+
+    return () => unsubscribe();
+  }, []);
 
 
   const userInfo = {

@@ -23,7 +23,8 @@ const router = createBrowserRouter([
         hydrateFallbackElement: (
           <span className="loading loading-ball loading-xs"></span>
         ),
-        loader: () => fetch('http://localhost:3000/blogs'),
+        loader: () =>
+          fetch('http://localhost:3000/blogs', { credentials: 'include' }),
         Component: Home,
       },
       {
@@ -39,7 +40,8 @@ const router = createBrowserRouter([
         hydrateFallbackElement: (
           <span className="loading loading-ball loading-xs"></span>
         ),
-        loader: () => fetch('http://localhost:3000/allBlogs'),
+        loader: () =>
+          fetch('http://localhost:3000/allBlogs', { credentials: 'include' }),
         element: (
           <PrivateRoute>
             <AllBlogs></AllBlogs>
@@ -52,7 +54,9 @@ const router = createBrowserRouter([
           <span className="loading loading-ball loading-xs"></span>
         ),
         loader: ({ params }) =>
-          fetch(`http://localhost:3000/allBlogs/${params.id}`),
+          fetch(`http://localhost:3000/allBlogs/${params.id}`, {
+            credentials: 'include',
+          }),
         element: (
           <PrivateRoute>
             <BlogDetails></BlogDetails>
@@ -65,7 +69,9 @@ const router = createBrowserRouter([
           <span className="loading loading-ball loading-xs"></span>
         ),
         loader: ({ params }) =>
-          fetch(`http://localhost:3000/allBlogs/${params.id}`),
+          fetch(`http://localhost:3000/allBlogs/${params.id}`, {
+            credentials: 'include',
+          }),
         element: (
           <PrivateRoute>
             <UpdateBlog></UpdateBlog>
@@ -77,12 +83,19 @@ const router = createBrowserRouter([
         hydrateFallbackElement: (
           <span className="loading loading-ball loading-xs"></span>
         ),
-        loader:()=>fetch('http://localhost:3000/featuredBlogs'),
+        loader: () =>
+          fetch('http://localhost:3000/featuredBlogs', {
+            credentials: 'include',
+          }),
         element: <FeaturedBlogs></FeaturedBlogs>,
       },
       {
         path: '/wishList',
-        element:<PrivateRoute><WishList></WishList></PrivateRoute>
+        element: (
+          <PrivateRoute>
+            <WishList></WishList>
+          </PrivateRoute>
+        ),
       },
       {
         path: '/login',

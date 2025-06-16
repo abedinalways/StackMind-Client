@@ -4,9 +4,10 @@ import { BiMessageRounded } from 'react-icons/bi';
 import { motion } from 'framer-motion';
 import { Link } from 'react-router';
 import UseAuth from '../Hooks/UseAuth';
-import axios from 'axios';
+
 import toast from 'react-hot-toast';
 import { useMutation, useQueryClient } from '@tanstack/react-query';
+import useAxios from '../Hooks/useAxios';
 
 const RecentBlogs = ({ blogData }) => {
   const { _id, title, category, name, photoURL } = blogData;
@@ -21,14 +22,14 @@ const RecentBlogs = ({ blogData }) => {
   const reactions = Math.floor(Math.random() * 10);
   const readingTime = Math.floor(Math.random() * 10) + 1;
   const comments = Math.floor(Math.random() * 10) + 2;
-
+  const { post, get } = useAxios();
   const { user } = UseAuth();
   const [isWished, setIsWished] = useState(false);
   const queryClient = useQueryClient();
 
   const addToWishList = useMutation({
     mutationFn: async ({ blogId, userEmail }) => {
-      const res = await axios.post('http://localhost:3000/wishList', {
+      const res = await post('/wishList', {
         blogId,
         userEmail,
       });
@@ -47,10 +48,10 @@ const RecentBlogs = ({ blogData }) => {
   useEffect(() => {
     const fetchWishlistStatus = async () => {
       try {
-        const res = await axios.get(
-          `http://localhost:3000/wishList/${user?.email}`
+        const res = await get(
+          `/wishList/${user?.email}`
         );
-        const wishedIds = res.data.map(item => item._id);
+        const wishedIds = res.data.map(item => item._id.toString());
         setIsWished(wishedIds.includes(_id));
       } catch (error) {
         console.error('Failed to fetch wishlist:', error);
@@ -58,7 +59,7 @@ const RecentBlogs = ({ blogData }) => {
     };
 
     if (user?.email) fetchWishlistStatus();
-  }, [user, _id]);
+  }, [user, _id, get]);
 
   return (
     <>
@@ -110,7 +111,7 @@ const RecentBlogs = ({ blogData }) => {
                 addToWishList.mutate({ blogId: _id, userEmail: user.email });
               }}
               className="flex items-center gap-1 text-blue-600 hover:text-red-500 disabled:opacity-50"
-              disabled={isWished}
+              disabled={isWished || addToWishList.isLoading}
             >
               <BsBookmarkStarFill size="20px" />
             </button>
