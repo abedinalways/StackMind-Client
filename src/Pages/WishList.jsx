@@ -8,9 +8,10 @@ import {
   useReactTable,
   getSortedRowModel,
 } from '@tanstack/react-table';
-import axios from 'axios';
+
 import toast from 'react-hot-toast';
 import UseAuth from '../Hooks/UseAuth';
+import useAxios from '../Hooks/useAxios';
 
 
 
@@ -20,6 +21,7 @@ const WishList = () => {
   const { user } = UseAuth();
   const queryClient = useQueryClient();
   const [sorting, setSorting] = useState([]);
+  const { get, del } = useAxios();
   
   
   const {
@@ -32,7 +34,7 @@ const WishList = () => {
       if (!user?.email) {
         throw new Error('User not logged in');
       }
-      const res = await axios.get(
+      const res = await get(
         `http://localhost:3000/wishList/${user.email}`
       );
       return res.data;
@@ -43,7 +45,7 @@ const WishList = () => {
   
   const removeFromWishList = useMutation({
     mutationFn: async blogId => {
-      const res = await axios.delete(
+      const res = await del(
         `http://localhost:3000/wishList/${blogId}?email=${user.email}`
       );
       return res.data;
@@ -53,7 +55,7 @@ const WishList = () => {
       toast.success('Blog removed from wishlist');
     },
     onError: err => {
-      toast.error(`Failed to remove blog: ${err.message}`);
+     
       console.error('Error removing from wishlist:', err);
     },
   });
@@ -127,7 +129,6 @@ const WishList = () => {
  
   useEffect(() => {
     if (error) {
-      toast.error(`Failed to fetch wishlist: ${error.message}`);
       console.error('Error fetching wishlist:', error);
     }
   }, [error]);
