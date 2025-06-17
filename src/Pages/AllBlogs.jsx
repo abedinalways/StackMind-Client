@@ -12,7 +12,6 @@ const AllBlogs = () => {
   const { get, post } = useAxios();
   const queryClient = useQueryClient();
 
-  // Fetch blogs with query parameters
   const {
     data: blogs = [],
     isLoading: loadingBlogs,
@@ -25,10 +24,9 @@ const AllBlogs = () => {
       });
       return res;
     },
-    enabled: true, 
+    enabled: true,
   });
 
-  // Fetch categories
   const {
     data: categories = [],
     isLoading: loadingCategories,
@@ -41,7 +39,6 @@ const AllBlogs = () => {
     },
   });
 
-  // Fetch wishlisted blogs
   const { data: wishlistedBlogs = [], isLoading: loadingWishlist } = useQuery({
     queryKey: ['wishListBlogs', user?.email],
     queryFn: async () => {
@@ -54,23 +51,21 @@ const AllBlogs = () => {
 
   const wishlistedIds = wishlistedBlogs.map(blog => blog._id);
 
-  // Mutation to add to wishlist
   const mutation = useMutation({
     mutationFn: async ({ blogId }) => {
       return await post('/wishList', { blogId, userEmail: user.email });
     },
-    onSuccess: (data, variables) => {
+    onSuccess: () => {
       toast.success('Added to wishlist');
       queryClient.invalidateQueries(['wishListBlogs', user?.email]);
     },
     onError: err => {
-      toast.error(err?.response?.data?.error || 'Failed to add to wishlist'); 
+      toast.error(err?.response?.data?.error || 'Failed to add to wishlist');
     },
   });
 
   const handleSearch = e => {
     e.preventDefault();
-    
   };
 
   const handleCategoryChange = e => {
@@ -85,7 +80,6 @@ const AllBlogs = () => {
     mutation.mutate({ blogId });
   };
 
-  // Handle errors
   useEffect(() => {
     if (blogsError && !blogsError.response?.status === 401) {
       toast.error('Error loading blogs');
@@ -96,7 +90,7 @@ const AllBlogs = () => {
   }, [blogsError, categoriesError]);
 
   return (
-    <div className="container mx-auto px-4 py-10 ">
+    <div className="container mx-auto px-4 py-10">
       <div className="flex flex-col md:flex-row justify-between items-center mb-6 gap-4">
         <form
           onSubmit={handleSearch}
@@ -104,7 +98,7 @@ const AllBlogs = () => {
         >
           <input
             type="text"
-            className="input md:w-80  border-amber-200 bg-white"
+            className="input md:w-80 border-amber-200 bg-white"
             placeholder="Search blogs by title"
             value={search}
             onChange={e => setSearch(e.target.value)}

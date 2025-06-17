@@ -9,6 +9,10 @@ const api = axios.create({
   withCredentials: true,
 });
 
+const publicEndpoints = [
+  /\/allBlogs\/.*/, 
+  /\/comments\?blogId=.*/, 
+];
 const useAxios = () => {
   const { signOutUser } = use(AuthContext);
   const navigate = useNavigate();
@@ -16,10 +20,16 @@ const useAxios = () => {
   api.interceptors.response.use(
     response => response,
     async error => {
-      if (error.response?.status === 401) {
+      const url = error.config?.url;
+      const isPublicEndpoint = publicEndpoints.some(regex => regex.test(url));
+
+      if (error.response?.status === 401 && !isPublicEndpoint) {
         toast.error('Session expired. Please log in again.');
         await signOutUser();
         navigate('/login', { replace: true });
+      } else if (error.response?.status === 401 && isPublicEndpoint) {
+       
+        return Promise.resolve({ data: [] }); 
       } else {
         toast.error(error.response?.data?.error || 'An error occurred');
       }

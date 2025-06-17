@@ -25,8 +25,11 @@ const router = createBrowserRouter([
         hydrateFallbackElement: (
           <span className="loading loading-ball loading-xs"></span>
         ),
-        loader: () =>
-          fetch('http://localhost:3000/blogs', { credentials: 'include' }),
+        loader: async() =>{
+          const res = await fetch('http://localhost:3000/blogs', { credentials: 'include' });
+          if (!res.ok) throw new Error('Failed to fetch blogs');
+         return res.json();
+        },
         Component: Home,
       },
       {
@@ -45,9 +48,9 @@ const router = createBrowserRouter([
         loader: () =>
           fetch('http://localhost:3000/allBlogs', { credentials: 'include' }),
         element: (
-          <PrivateRoute>
+          
             <AllBlogs></AllBlogs>
-          </PrivateRoute>
+          
         ),
       },
       {
@@ -55,16 +58,21 @@ const router = createBrowserRouter([
         hydrateFallbackElement: (
           <span className="loading loading-ball loading-xs"></span>
         ),
-        loader: ({ params }) =>
-          fetch(`http://localhost:3000/allBlogs/${params.id}`, {
-            credentials: 'include',
-          }),
-        element: (
-          <PrivateRoute>
-            <BlogDetails></BlogDetails>
-          </PrivateRoute>
-        ),
-      },
+        loader: async ({ params }) => {
+    const res = await fetch(`http://localhost:3000/allBlogs/${params.id}`, {
+      credentials: 'include',
+    });
+    if (!res.ok) {
+      if (res.status === 401 || res.status === 403) {
+        return null; // Handle unauthenticated access
+      }
+      throw new Error('Failed to fetch blog');
+    }
+    return res.json();
+  },
+  element: <BlogDetails />,
+},
+     
       {
         path: '/updateBlog/:id',
         hydrateFallbackElement: (
