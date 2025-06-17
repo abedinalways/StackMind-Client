@@ -1,12 +1,35 @@
-# React + Vite
+# StackMind Web Blog-cilent
 
-This template provides a minimal setup to get React working in Vite with HMR and some ESLint rules.
+## Project Overview
+- **Project Name**: StackMind Web Blog
+- **Purpose**: This is the frontend for the StackMind Web Blog platform, built with React. It provides a responsive user interface to browse blogs, post content, manage user accounts, and interact with the backend APIs.
+- **Live URL**: https://stackmind-auth.web.app/
 
-Currently, two official plugins are available:
+## Key Features
+- Browse and filter recent blogs by category.
+- User authentication and profile management.
+- Create, edit, and delete blog posts.
+- Wishlist functionality for saving favorite blogs.
+- Commenting system on blog posts.
+- Animated UI elements and toast notifications.
 
-- [@vitejs/plugin-react](https://github.com/vitejs/vite-plugin-react/blob/main/packages/plugin-react) uses [Babel](https://babeljs.io/) for Fast Refresh
-- [@vitejs/plugin-react-swc](https://github.com/vitejs/vite-plugin-react/blob/main/packages/plugin-react-swc) uses [SWC](https://swc.rs/) for Fast Refresh
+## NPM Packages Used
+- `react`: JavaScript library for building user interfaces.
+- `react-router`: Declarative routing for React applications.
+- `tanstack-query` (React Query): Data fetching and state management.
+- `axios`: Promise-based HTTP client for API requests.
+- `dotenv`: Load environment variables from a `.env` file.
+- `tailwindcss`: Utility-first CSS framework.
+- `daisyui`: Tailwind CSS component library.
+- `react-icons`: SVG icon components for React.
+- `framer-motion`: Animation library for React.
+- `lottie-react`: Render Lottie animations in React.
+- `react-hot-toast`: Toast notification library.
 
-## Expanding the ESLint configuration
+## Setup and Usage
+- Clone the repository, install dependencies with `npm install`, and configure the `.env` file with `VITE_API_BASE_URL=https://stack-mind-server.vercel.app`.
+- Run locally with `npm run dev` or deploy to Vercel with `vercel --prod`.
+- Access the app at the live URL or `http://localhost:5173` during development.
 
-If you are developing a production application, we recommend using TypeScript with type-aware lint rules enabled. Check out the [TS template](https://github.com/vitejs/vite/tree/main/packages/create-vite/template-react-ts) for information on how to integrate TypeScript and [`typescript-eslint`](https://typescript-eslint.io) in your project.
+## Acknowledgements
+Developed with support from the xAI team.
