@@ -30,7 +30,7 @@ const RecentBlogs = ({ blogData }) => {
   const addToWishList = useMutation({
     mutationFn: async ({ blogId, userEmail }) => {
       const res = await post('/wishList', {
-        blogId: _id.toString(),
+        blogId,
         userEmail,
       });
       return res.data;
@@ -45,20 +45,25 @@ const RecentBlogs = ({ blogData }) => {
     },
   });
 
-  useEffect(() => {
-    const fetchWishlistStatus = async () => {
-      try {
-        const res = await get(`/wishList/${user?.email}`);
-        console.log('Wishlist response:', res);
-        const wishedIds = res.data.map(item => item.blogId.toString());
-        setIsWished(wishedIds.includes(_id.toString()));
-      } catch (error) {
-        console.error('Failed to fetch wishlist:', error);
-      }
-    };
+   useEffect(() => {
+     const fetchWishlistStatus = async () => {
+       if (!user?.email) {
+         setIsWished(false);
+         return;
+       }
+       try {
+         const res = await get(`/wishList/${user.email}`);
+         const wishedBlogs = Array.isArray(res.data) ? res.data : [];
+         const wishedIds = wishedBlogs.map(item => item.blogId); 
+         setIsWished(wishedIds.includes(_id));
+       } catch (error) {
+         console.error('Failed to fetch wishlist status:', error);
+         setIsWished(false);
+       }
+     };
 
-    if (user?.email) fetchWishlistStatus();
-  }, [user, _id, get]);
+     fetchWishlistStatus();
+   }, [user?.email, _id, get]);
 
   return (
     <>

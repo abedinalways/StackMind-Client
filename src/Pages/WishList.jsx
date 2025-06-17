@@ -23,6 +23,14 @@ const WishList = () => {
   const [sorting, setSorting] = useState([]);
   const { get, del } = useAxios();
   
+  const isValidBlog = blog =>
+    blog &&
+    typeof blog._id === 'string' &&
+    typeof blog.title === 'string' &&
+    typeof blog.category === 'string' &&
+    typeof blog.name === 'string' &&
+    typeof blog.wordCount === 'number' &&
+    typeof blog.createdAt === 'string';
   
   const {
     data: blogs = [],
@@ -33,19 +41,26 @@ const WishList = () => {
     queryFn: async () => {
       if (!user?.email) return [];
       try {
-        const res = await get(`/wishList/${user.email}`);
-        console.log('Wishlist data:', res.data); 
-        return res.data || []; 
+        console.log('Fetching wishlist for email:', user.email);
+        const data = await get(`/wishList/${user.email}`);
+        console.log('Full API response:', data);
+        const validBlogs = Array.isArray(data)
+          ? data.filter(isValidBlog)
+          : [];
+        if (!Array.isArray(data)) {
+          console.warn('API returned non-array data:', data);
+        }
+        return validBlogs;
       } catch (err) {
         console.error('Error fetching wishlist:', err);
-        return []; 
+        throw new Error('Failed to fetch wishlist');
       }
     },
     enabled: !!user?.email,
   });
   
   const removeFromWishList = useMutation({
-    mutationFn: async blogId => {
+    mutationFn: async (blogId)=> {
       const res = await del(
         `/wishList/${blogId}?email=${user.email}`
       );
@@ -109,9 +124,15 @@ const WishList = () => {
           <button
             onClick={() => removeFromWishList.mutate(info.row.original._id)}
             className="px-2 py-1 bg-red-600 text-white rounded hover:bg-red-700 text-xs sm:text-sm"
-            disabled={removeFromWishList.isLoading}
+            disabled={
+              removeFromWishList.isLoading &&
+              removeFromWishList.variables === info.row.original._id
+            }
           >
-            {removeFromWishList.isLoading ? 'Removing...' : 'Remove'}
+            {removeFromWishList.isLoading &&
+            removeFromWishList.variables === info.row.original._id
+              ? 'Removing...'
+              : 'Remove'}
           </button>
         </div>
       ),
