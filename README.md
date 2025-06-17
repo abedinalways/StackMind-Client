@@ -31,5 +31,4 @@
 - Run locally with `npm run dev` or deploy to Vercel with `vercel --prod`.
 - Access the app at the live URL or `http://localhost:5173` during development.
 
-## Acknowledgements
-Developed with support from the xAI team.
+
