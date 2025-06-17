@@ -11,11 +11,13 @@ import BlogDetails from '../Components/BlogDetails';
 import UpdateBlog from '../Pages/UpdateBlog';
 import FeaturedBlogs from '../Pages/FeaturedBlogs';
 import WishList from '../Pages/WishList';
+import ErrorPage from '../ErrorPage/ErrorPage';
 
 const router = createBrowserRouter([
   {
     path: '/',
     Component: Root,
+    errorElement: <ErrorPage/>,
     children: [
       {
         index: true,
