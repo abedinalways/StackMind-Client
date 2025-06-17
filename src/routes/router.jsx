@@ -17,7 +17,7 @@ const router = createBrowserRouter([
   {
     path: '/',
     Component: Root,
-    errorElement: <ErrorPage/>,
+    errorElement: <ErrorPage />,
     children: [
       {
         index: true,
@@ -25,10 +25,13 @@ const router = createBrowserRouter([
         hydrateFallbackElement: (
           <span className="loading loading-ball loading-xs"></span>
         ),
-        loader: async() =>{
-          const res = await fetch('http://localhost:3000/blogs', { credentials: 'include' });
+        loader: async () => {
+          const res = await fetch(
+            'https://stack-mind-server.vercel.app/blogs',
+            { credentials: 'include' }
+          );
           if (!res.ok) throw new Error('Failed to fetch blogs');
-         return res.json();
+          return res.json();
         },
         Component: Home,
       },
@@ -46,12 +49,10 @@ const router = createBrowserRouter([
           <span className="loading loading-ball loading-xs"></span>
         ),
         loader: () =>
-          fetch('http://localhost:3000/allBlogs', { credentials: 'include' }),
-        element: (
-          
-            <AllBlogs></AllBlogs>
-          
-        ),
+          fetch('https://stack-mind-server.vercel.app/allBlogs', {
+            credentials: 'include',
+          }),
+        element: <AllBlogs></AllBlogs>,
       },
       {
         path: '/allBlogs/:id',
@@ -59,27 +60,30 @@ const router = createBrowserRouter([
           <span className="loading loading-ball loading-xs"></span>
         ),
         loader: async ({ params }) => {
-    const res = await fetch(`http://localhost:3000/allBlogs/${params.id}`, {
-      credentials: 'include',
-    });
-    if (!res.ok) {
-      if (res.status === 401 || res.status === 403) {
-        return null; // Handle unauthenticated access
-      }
-      throw new Error('Failed to fetch blog');
-    }
-    return res.json();
-  },
-  element: <BlogDetails />,
-},
-     
+          const res = await fetch(
+            `https://stack-mind-server.vercel.app/allBlogs/${params.id}`,
+            {
+              credentials: 'include',
+            }
+          );
+          if (!res.ok) {
+            if (res.status === 401 || res.status === 403) {
+              return null; // Handle unauthenticated access
+            }
+            throw new Error('Failed to fetch blog');
+          }
+          return res.json();
+        },
+        element: <BlogDetails />,
+      },
+
       {
         path: '/updateBlog/:id',
         hydrateFallbackElement: (
           <span className="loading loading-ball loading-xs"></span>
         ),
         loader: ({ params }) =>
-          fetch(`http://localhost:3000/allBlogs/${params.id}`, {
+          fetch(`https://stack-mind-server.vercel.app/allBlogs/${params.id}`, {
             credentials: 'include',
           }),
         element: (
@@ -94,7 +98,7 @@ const router = createBrowserRouter([
           <span className="loading loading-ball loading-xs"></span>
         ),
         loader: () =>
-          fetch('http://localhost:3000/featuredBlogs', {
+          fetch('https://stack-mind-server.vercel.app/featuredBlogs', {
             credentials: 'include',
           }),
         element: <FeaturedBlogs></FeaturedBlogs>,

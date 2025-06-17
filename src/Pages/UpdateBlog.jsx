@@ -12,30 +12,28 @@ const UpdateBlog = () => {
   const navigate = useNavigate();
   const [loading, setLoading] = useState(false);
   const [blog, setBlog] = useState(null);
-  const { get, patch} = useAxios();
+  const { get, patch } = useAxios();
 
-  
   useEffect(() => {
     const fetchBlog = async () => {
       try {
-        const res = await get(`http://localhost:3000/allBlogs/${id}`);
+        const res = await get(
+          `https://stack-mind-server.vercel.app/allBlogs/${id}`
+        );
         setBlog(res.data);
       } catch (err) {
-        
         console.error('Error fetching blog:', err);
       }
     };
     fetchBlog();
   }, [id, get]);
 
- 
   if (blog && user?.email !== blog.email) {
     toast.error('You are not authorized to edit this blog');
     navigate('/blogs');
     return null;
   }
 
-  
   const handleUpdateBlog = async e => {
     e.preventDefault();
     setLoading(true);
@@ -53,7 +51,7 @@ const UpdateBlog = () => {
 
     try {
       const res = await patch(
-        `http://localhost:3000/allBlogs/${id}?email=${user?.email}`,
+        `https://stack-mind-server.vercel.app/allBlogs/${id}?email=${user?.email}`,
         updatedBlog
       );
       if (res.data.message === 'Blog updated successfully') {
@@ -67,7 +65,6 @@ const UpdateBlog = () => {
         navigate(`/allBlogs/${id}`);
       }
     } catch (err) {
-      
       console.error('Error updating blog:', err);
     } finally {
       setLoading(false);

@@ -11,11 +11,9 @@ import {
 import axios from 'axios';
 import toast from 'react-hot-toast';
 
-
 const columnHelper = createColumnHelper();
 
 const FeaturedBlogs = () => {
-  
   const {
     data: blogs = [],
     isLoading,
@@ -24,7 +22,9 @@ const FeaturedBlogs = () => {
     queryKey: ['featuredBlogs'],
     queryFn: async () => {
       try {
-        const res = await axios.get('http://localhost:3000/featuredBlogs');
+        const res = await axios.get(
+          'https://stack-mind-server.vercel.app/featuredBlogs'
+        );
         return res.data;
       } catch (err) {
         console.error('Axios error:', err.response?.data, err.message);
@@ -33,7 +33,6 @@ const FeaturedBlogs = () => {
     },
   });
 
-  
   const columns = [
     columnHelper.accessor('title', {
       header: 'Title',
@@ -57,10 +56,8 @@ const FeaturedBlogs = () => {
       header: 'Word Count',
       cell: info => info.getValue().toLocaleString(),
     }),
-    
   ];
 
-  
   const [sorting, setSorting] = useState([]);
   const table = useReactTable({
     data: blogs,
@@ -73,7 +70,6 @@ const FeaturedBlogs = () => {
     },
   });
 
-  
   useEffect(() => {
     if (error) {
       toast.error(`Failed to fetch featured blogs: ${error.message}`);
@@ -89,7 +85,6 @@ const FeaturedBlogs = () => {
         Featured Blogs: Top 10 by Word Count
       </h1>
       <div className="bg-white rounded-xl shadow-md">
-        
         <table className="w-full border-collapse">
           <thead>
             {table.getHeaderGroups().map(headerGroup => (
@@ -136,8 +131,6 @@ const FeaturedBlogs = () => {
           </p>
         )}
       </div>
-
-      
     </div>
   );
 };

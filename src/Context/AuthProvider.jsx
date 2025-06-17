@@ -1,32 +1,38 @@
-import React, {useEffect, useState } from 'react';
+import React, { useEffect, useState } from 'react';
 import { AuthContext } from './AuthContext';
-import { createUserWithEmailAndPassword, GoogleAuthProvider, onAuthStateChanged, signInWithEmailAndPassword, signInWithPopup, signOut } from 'firebase/auth';
+import {
+  createUserWithEmailAndPassword,
+  GoogleAuthProvider,
+  onAuthStateChanged,
+  signInWithEmailAndPassword,
+  signInWithPopup,
+  signOut,
+} from 'firebase/auth';
 import { auth } from '../Firebase/firebase.init';
 import axios from 'axios';
 
 import toast from 'react-hot-toast';
 
-
 const api = axios.create({
-  baseURL: 'http://localhost:3000',
+  baseURL: 'https://stack-mind-server.vercel.app',
   withCredentials: true,
 });
 
 const AuthProvider = ({ children }) => {
   const [user, setUser] = useState(null);
-  const [loading, setLoading]=useState(true);
-  
+  const [loading, setLoading] = useState(true);
+
   const createUser = (email, password) => {
     setLoading(true);
-    return createUserWithEmailAndPassword(auth, email, password)
-  }
-  
+    return createUserWithEmailAndPassword(auth, email, password);
+  };
+
   const signInUser = (email, password) => {
     setLoading(true);
-    return signInWithEmailAndPassword(auth, email, password)
-  }
-  
-  const signOutUser = async() => {
+    return signInWithEmailAndPassword(auth, email, password);
+  };
+
+  const signOutUser = async () => {
     setLoading(true);
     try {
       await api.post('/logout', {});
@@ -38,14 +44,14 @@ const AuthProvider = ({ children }) => {
     } finally {
       setLoading(false);
     }
-  }
+  };
 
   const googleSignIn = () => {
     setLoading(true);
     const provider = new GoogleAuthProvider();
-    return signInWithPopup(auth, provider)
-  }
-  
+    return signInWithPopup(auth, provider);
+  };
+
   useEffect(() => {
     const unsubscribe = onAuthStateChanged(auth, async currentUser => {
       setUser(currentUser);
@@ -60,7 +66,6 @@ const AuthProvider = ({ children }) => {
           console.error('JWT generation error:', err);
           await signOut(auth);
           setUser(null);
-          
         }
       }
       setLoading(false);
@@ -69,7 +74,6 @@ const AuthProvider = ({ children }) => {
     return () => unsubscribe();
   }, []);
 
-
   const userInfo = {
     createUser,
     user,
@@ -77,8 +81,8 @@ const AuthProvider = ({ children }) => {
     signInUser,
     signOutUser,
     googleSignIn,
-  }
-  return <AuthContext value={userInfo}>{children}</AuthContext>
+  };
+  return <AuthContext value={userInfo}>{children}</AuthContext>;
 };
 
 export default AuthProvider;

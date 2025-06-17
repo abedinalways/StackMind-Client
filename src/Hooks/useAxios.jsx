@@ -1,41 +1,54 @@
-import { useCallback, use } from 'react';
+import { useCallback, useEffect, useMemo, use } from 'react';
 import axios from 'axios';
 import toast from 'react-hot-toast';
 import { useNavigate } from 'react-router';
 import { AuthContext } from '../Context/AuthContext';
 
 const api = axios.create({
-  baseURL: 'http://localhost:3000',
+  baseURL: 'https://stack-mind-server.vercel.app',
   withCredentials: true,
+  timeout: 10000, // Optional: 10s timeout
 });
 
-const publicEndpoints = [
-  /\/allBlogs\/.*/, 
-  /\/comments\?blogId=.*/, 
-];
+const publicEndpoints = [/\/allBlogs\/.*/, /\/comments\?blogId=.*/];
+
 const useAxios = () => {
   const { signOutUser } = use(AuthContext);
   const navigate = useNavigate();
 
-  api.interceptors.response.use(
-    response => response,
-    async error => {
-      const url = error.config?.url;
-      const isPublicEndpoint = publicEndpoints.some(regex => regex.test(url));
+  useEffect(() => {
+    const interceptor = api.interceptors.response.use(
+      response => response,
+      async error => {
+        const url = error.config?.url;
+        const status = error.response?.status;
 
-      if (error.response?.status === 401 && !isPublicEndpoint) {
-        toast.error('Session expired. Please log in again.');
-        await signOutUser();
-        navigate('/login', { replace: true });
-      } else if (error.response?.status === 401 && isPublicEndpoint) {
-       
-        return Promise.resolve({ data: [] }); 
-      } else {
-        toast.error(error.response?.data?.error || 'An error occurred');
+        console.error('Axios error:', {
+          url,
+          status,
+          data: error.response?.data,
+        });
+
+        const isPublicEndpoint = publicEndpoints.some(regex => regex.test(url));
+
+        if (status === 401 && !isPublicEndpoint) {
+          toast.error('Session expired. Please log in again.');
+          await signOutUser();
+          navigate('/login', { replace: true });
+        } else if (status === 401 && isPublicEndpoint) {
+          return Promise.resolve({ data: [] });
+        } else {
+          toast.error(error.response?.data?.error || 'An error occurred');
+        }
+
+        return Promise.reject(error);
       }
-      return Promise.reject(error);
-    }
-  );
+    );
+
+    return () => {
+      api.interceptors.response.eject(interceptor);
+    };
+  }, [signOutUser, navigate]);
 
   const get = useCallback(async (url, config = {}) => {
     const response = await api.get(url, config);
@@ -44,6 +57,11 @@ const useAxios = () => {
 
   const post = useCallback(async (url, data, config = {}) => {
     const response = await api.post(url, data, config);
+    return response.data;
+  }, []);
+
+  const put = useCallback(async (url, data, config = {}) => {
+    const response = await api.put(url, data, config);
     return response.data;
   }, []);
 
@@ -57,7 +75,7 @@ const useAxios = () => {
     return response.data;
   }, []);
 
-  return { get, post, patch, del };
+  return useMemo(() => ({ get, post, put, patch, del }), [get, post, put, patch, del]);
 };
 
 export default useAxios;

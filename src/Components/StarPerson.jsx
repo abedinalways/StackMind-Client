@@ -1,15 +1,17 @@
 import axios from 'axios';
 import React, { useEffect, useState } from 'react';
-import lottie from '../assets/lottie.json'
+import lottie from '../assets/lottie.json';
 import Lottie from 'lottie-react';
 const StarPerson = () => {
   const [person, setPerson] = useState(null);
   useEffect(() => {
-    axios.get('http://localhost:3000/api/starPerson').then(res => {
-      setPerson(res.data)
-    })
-  }, [])
-  if(!person) return <span className="loading loading-ball loading-xs"></span>;
+    axios
+      .get('https://stack-mind-server.vercel.app/api/starPerson')
+      .then(res => {
+        setPerson(res.data);
+      });
+  }, []);
+  if (!person) return <span className="loading loading-ball loading-xs"></span>;
   return (
     <div className="flex flex-col lg:flex-row justify-between items-start gap-4 md:px-10 py-10 relative">
       <div className="flex flex-col md:flex-row items-start gap-6 border-l-5 border-orange-400 pl-4 my-12 mx-20">
