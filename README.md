@@ -3,7 +3,7 @@
 StackMind is a modern and responsive web blogging platform where users can explore blogs, write and manage their own posts, interact with other users, and bookmark content they love. This repository contains the **frontend** codebase built using **React**, styled with **Tailwind CSS** and **DaisyUI**, and powered by modern tools like **TanStack Query**, **Axios**, and **Framer Motion** for an engaging user experience.
 
 <p align="center">
-  <img src="https://github.com/abedinalways/StackMind-Web-Blog/blob/main/stackmind-screenshot.png" alt="StackMind Screenshot" />
+  <img src="https://github.com/abedinalways/StackMind-Client/blob/main/stackMind_app.png" alt="StackMind Screenshot" />
 </p>
 
 ---
