@@ -5,6 +5,8 @@ import { LuBrainCircuit } from 'react-icons/lu';
 import { NavLink } from 'react-router';
 import { AuthContext } from '../Context/AuthContext';
 import toast from 'react-hot-toast';
+import ThemeToggle from './ThemeToggle';
+import ThemeSelector from './ThemeSelector';
 const Navbar = () => {
   const { user, signOutUser } = use(AuthContext);
 
@@ -144,7 +146,7 @@ const Navbar = () => {
   );
 
   return (
-    <div className="navbar shadow-sm bg-red-500">
+    <div className="navbar shadow-sm bg-red-500 sticky z-100 top-0">
       <div className="navbar-start">
         <div className="flex text-white">
           {/* dropdown menu */}
@@ -165,7 +167,7 @@ const Navbar = () => {
                 aria-label="close sidebar"
                 className="drawer-overlay"
               ></label>
-              <ul className="menu bg-base-200 text-white min-h-full w-70 p-4 font-[suse] font-bold">
+              <ul className="menu bg-gray-800 text-white min-h-full w-70 p-4 font-[suse] font-bold">
                 {/* Sidebar content here */}
                 {nav}
               </ul>
@@ -184,8 +186,12 @@ const Navbar = () => {
         </div>
         <div className="md:hidden flex-col ml-10">{navEnd}</div>
       </div>
-      <div className="navbar-end mx-20 md:flex gap-2 font-[sora] font-bold hidden">
-        {navEnd}
+      <div className="navbar-end mx-20  gap-2 font-[sora] font-bold">
+        <div className='md:flex hidden'>{navEnd}</div>
+        <div className="flex">
+          <ThemeToggle />
+          <ThemeSelector />
+        </div>
       </div>
     </div>
   );

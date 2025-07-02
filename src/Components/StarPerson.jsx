@@ -21,14 +21,14 @@ const StarPerson = () => {
           alt={person.name}
           className="md:w-45 md:h-30 w-25 rounded-xl border-4 cursor-pointer rotate-[-25deg] hover:rotate-0 transition-transform duration-300 border-red-400 shadow-md"
         />
-        <div>
-          <p className="font-[suse] text-4xl font-bold tracking-widest text-gray-500">
+        <div className="">
+          <p className="font-[suse] text-4xl font-bold tracking-widest text-gray-500 dark:text-white">
             PERSON OF THE MOMENT
           </p>
           <h1 className="font-[sora] text-sm ml-2 mt-2 font-semibold text-[#00de56]">
             {person.name}
           </h1>
-          <p className="text-xs text-gray-600 mt-4 font-bold md:w-3/5 font-[Mulish]">
+          <p className="text-xs text-gray-600 mt-4 font-bold md:w-3/5 font-[Mulish] dark:text-white">
             {person.bio}
           </p>
         </div>

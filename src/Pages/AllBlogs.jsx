@@ -98,7 +98,7 @@ const AllBlogs = () => {
         >
           <input
             type="text"
-            className="input md:w-80 border-amber-200 bg-white"
+            className="input md:w-80 border-amber-200 bg-white dark:text-black"
             placeholder="Search blogs by title"
             value={search}
             onChange={e => setSearch(e.target.value)}

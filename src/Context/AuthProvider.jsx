@@ -10,7 +10,6 @@ import {
 } from 'firebase/auth';
 import { auth } from '../Firebase/firebase.init';
 import axios from 'axios';
-
 import toast from 'react-hot-toast';
 
 const api = axios.create({
@@ -35,7 +34,7 @@ const AuthProvider = ({ children }) => {
   const signOutUser = async () => {
     setLoading(true);
     try {
-      await api.post('/logout', {});
+      await api.post('/logout');
       await signOut(auth);
       setUser(null);
     } catch (err) {
@@ -82,6 +81,7 @@ const AuthProvider = ({ children }) => {
     signOutUser,
     googleSignIn,
   };
+
   return <AuthContext value={userInfo}>{children}</AuthContext>;
 };
 

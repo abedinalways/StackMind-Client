@@ -7,7 +7,7 @@ import { AuthContext } from '../Context/AuthContext';
 const api = axios.create({
   baseURL: 'https://stack-mind-server.vercel.app',
   withCredentials: true,
-  timeout: 10000, // Optional: 10s timeout
+  timeout: 500000,
 });
 
 const publicEndpoints = [/\/allBlogs\/.*/, /\/comments\?blogId=.*/];
@@ -75,7 +75,10 @@ const useAxios = () => {
     return response.data;
   }, []);
 
-  return useMemo(() => ({ get, post, put, patch, del }), [get, post, put, patch, del]);
+  return useMemo(
+    () => ({ get, post, put, patch, del }),
+    [get, post, put, patch, del]
+  );
 };
 
 export default useAxios;

@@ -39,7 +39,7 @@ const Home = () => {
               )}
             </div>
             <div className="flex justify-center">
-              <Link to="/blogs" className="font-[Suse] btn btn-link text-lg text-gray-800 cursor-pointer">
+              <Link to="/blogs" className="font-[Suse] btn btn-link text-lg text-gray-800 cursor-pointer dark:text-white">
                 SEE MORE LATEST ARTICLES <span><FaLongArrowAltRight /></span>
               </Link>
             </div>

@@ -15,7 +15,7 @@ const StackMindFamily = () => {
       <h2 className="text-3xl md:text-5xl font-bold text-orange-400 mb-10 font-[sora]">
         That's The StackMind Family.
         <br />
-        <span className="text-lg md:text-xl text-gray-600">
+        <span className="text-lg md:text-xl text-gray-600 dark:text-white">
           <Typewriter
             words={['StackMind Magazine is so much more than articles.']}
             loop={false}

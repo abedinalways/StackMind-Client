@@ -28,7 +28,9 @@ const router = createBrowserRouter([
         loader: async () => {
           const res = await fetch(
             'https://stack-mind-server.vercel.app/blogs',
-            { credentials: 'include' }
+            {
+              credentials: 'include',
+            }
           );
           if (!res.ok) throw new Error('Failed to fetch blogs');
           return res.json();
@@ -68,7 +70,7 @@ const router = createBrowserRouter([
           );
           if (!res.ok) {
             if (res.status === 401 || res.status === 403) {
-              return null; // Handle unauthenticated access
+              return null;
             }
             throw new Error('Failed to fetch blog');
           }
